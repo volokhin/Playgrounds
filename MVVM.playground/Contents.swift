@@ -1,24 +1,34 @@
 import UIKit
 import PlaygroundSupport
 
+// MARK: - OrdersProvider
+
 struct Order {
     let name: String
+    let id: Int
 }
 
 class OrdersProvider {
     func loadOrders(completion: @escaping ([Order]) -> Void) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            completion((0...99).map { Order(name: "Order #\($0)") })
+            completion((0...99).map { Order(name: "Order", id: $0) })
         }
     }
 }
 
+// MARK: - OrderVM
+
 class OrderVM {
-    let name: String
-    init(name: String) {
-        self.name = name
+    let order: Order
+    var name: String {
+        return "\(order.name) #\(order.id)"
+    }
+    init(order: Order) {
+        self.order = order
     }
 }
+
+// MARK: - OrderVM
 
 class OrdersVM: INotifyOnChanged {
     
@@ -33,11 +43,13 @@ class OrdersVM: INotifyOnChanged {
     
     func loadOrders() {
         ordersProvider.loadOrders() { [weak self] model in
-            self?.orders = model.map { OrderVM(name: $0.name) }
+            self?.orders = model.map { OrderVM(order: $0) }
             self?.changed.raise()
         }
     }
 }
+
+// MARK: - OrderCell
 
 class OrderCell: UITableViewCell, IHaveViewModel {
     typealias ViewModel = OrderVM
@@ -46,6 +58,8 @@ class OrderCell: UITableViewCell, IHaveViewModel {
         textLabel?.text = viewModel.name
     }
 }
+
+// MARK: - OrdersVC
 
 class OrdersVC: UIViewController, IHaveViewModel {
     typealias ViewModel = OrdersVM
@@ -83,6 +97,8 @@ extension OrdersVC: UITableViewDataSource {
         return cell
     }
 }
+
+// MARK: - Main
 
 let vm = OrdersVM(ordersProvider: OrdersProvider())
 let vc = OrdersVC()

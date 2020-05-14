@@ -1,5 +1,7 @@
 import Foundation
 
+// MARK: - OrdersProvider
+
 class OrdersProvider: ISingleton {
     required init(container: IContainer, args: Void) { }
     
@@ -8,11 +10,15 @@ class OrdersProvider: ISingleton {
     }
 }
 
+// MARK: - OrdersProviderMock
+
 class OrdersProviderMock: OrdersProvider {
     override func loadOrders(for customerId: Int, date: Date) {
         print("Loading mock orders for customer '\(customerId)', date '\(date)'")
     }
 }
+
+// MARK: - OrdersVM
 
 class OrdersVM: IPerRequest {
     struct Args {
@@ -33,6 +39,8 @@ class OrdersVM: IPerRequest {
     }
 }
 
+// MARK: - Main
+
 ContainerHolder.container = Container()
 let viewModel: OrdersVM = ContainerHolder.container.resolve(args: .init(customerId: 42, date: Date()))
 viewModel.loadOrders()
@@ -42,3 +50,4 @@ ContainerHolder.container = containerMock
 containerMock.replace(OrdersProvider.self, with: OrdersProviderMock.self)
 let viewModelWithMock: OrdersVM = containerMock.resolve(args: .init(customerId: 42, date: Date()))
 viewModelWithMock.loadOrders()
+print("Finish")
