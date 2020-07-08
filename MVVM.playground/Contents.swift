@@ -32,7 +32,6 @@ class OrderVM {
 
 class OrdersVM: INotifyOnChanged {
     
-    @Observable
     var orders: [OrderVM] = []
     
     private var ordersProvider: OrdersProvider
