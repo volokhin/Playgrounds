@@ -5,14 +5,14 @@ public enum InstanceScope {
     case singleton
 }
 
-public protocol IResolvable {
+public protocol IResolvable: AnyObject {
     associatedtype Arguments
     
     static var instanceScope: InstanceScope { get }
     init(container: IContainer, args: Arguments)
 }
 
-public protocol ISingleton: IResolvable { }
+public protocol ISingleton: IResolvable where Arguments == Void { }
 public extension ISingleton {
     static var instanceScope: InstanceScope {
         return .singleton
@@ -31,7 +31,7 @@ public protocol IContainer: AnyObject {
 }
 
 public class Container {
-    private var singletons: [ObjectIdentifier: Any] = [:]
+    private var singletons: [ObjectIdentifier: AnyObject] = [:]
     public init() { }
     
     func makeInstance<T: IResolvable>(args: T.Arguments) -> T {
